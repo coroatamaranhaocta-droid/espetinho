@@ -10,7 +10,14 @@ interface LoginScreenProps {
 
 export default function LoginScreen({ onLoginSuccess, theme }: LoginScreenProps) {
   const [showGoogleModal, setShowGoogleModal] = useState(false);
-  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('mode') === 'admin' || params.get('admin') === 'true';
+    } catch (e) {
+      return false;
+    }
+  });
   
   // Background Falling Espetinhos (Skewers) & Ingredients
   const fallingItems = React.useMemo(() => {
@@ -54,6 +61,17 @@ export default function LoginScreen({ onLoginSuccess, theme }: LoginScreenProps)
   const [adminPassword, setAdminPassword] = useState('');
   const [adminError, setAdminError] = useState('');
   const [isAdminLoading, setIsAdminLoading] = useState(false);
+
+  const handleToggleAdmin = () => {
+    try {
+      const adminUrl = new URL(window.location.href);
+      adminUrl.searchParams.set('mode', 'admin');
+      window.open(adminUrl.toString(), '_blank');
+    } catch (e) {
+      console.warn("Could not open admin login in new tab:", e);
+    }
+    setShowAdminLogin(true);
+  };
 
   // Preset Google Accounts for quick simulation testing
   const presetGoogleAccounts = [
@@ -332,7 +350,7 @@ export default function LoginScreen({ onLoginSuccess, theme }: LoginScreenProps)
 
               <div className="pt-4 border-t border-zinc-150 dark:border-zinc-800">
                 <button
-                  onClick={() => setShowAdminLogin(true)}
+                  onClick={handleToggleAdmin}
                   className="text-xs font-bold text-rose-600 dark:text-rose-405 flex items-center justify-center gap-1.5 mx-auto hover:underline"
                   id="toggle-admin-login-link"
                 >

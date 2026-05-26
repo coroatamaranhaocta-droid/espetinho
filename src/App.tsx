@@ -286,7 +286,7 @@ export default function App() {
             </h3>
           </div>
 
-          <div className="flex items-center space-x-2 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none custom-scrollbar" id="category-scroller-row">
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 pb-2" id="category-scroller-row">
             {/* Clear All Categories option */}
             <button
               onClick={() => setSelectedCategory('all')}
@@ -348,7 +348,7 @@ export default function App() {
             <span className="text-xs font-bold text-zinc-400 capitalize">{filteredProducts.length} itens encontrados</span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
             <AnimatePresence>
               {filteredProducts.map((prod) => (
                 <motion.div

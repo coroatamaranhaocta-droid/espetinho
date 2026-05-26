@@ -1,6 +1,6 @@
 import React from 'react';
-import { ShoppingBag, MapPin, Clock, ShieldCheck, Bike, MessageCircle, Moon, Sun } from 'lucide-react';
-import { StoreSettings } from '../types';
+import { ShoppingBag, MapPin, Clock, ShieldCheck, Bike, MessageCircle, Moon, Sun, LogOut } from 'lucide-react';
+import { StoreSettings, User } from '../types';
 
 interface HeaderProps {
   settings: StoreSettings;
@@ -13,6 +13,8 @@ interface HeaderProps {
   hasActiveOrders: boolean;
   theme: 'light' | 'dark';
   setTheme: (t: 'light' | 'dark') => void;
+  user: User | null;
+  onLogout: () => void;
 }
 
 export default function Header({
@@ -25,7 +27,9 @@ export default function Header({
   onOpenTracker,
   hasActiveOrders,
   theme,
-  setTheme
+  setTheme,
+  user,
+  onLogout
 }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-md border-b bg-white/95 dark:bg-zinc-900/95 border-zinc-200 dark:border-zinc-800 transition-colors duration-300">
@@ -100,25 +104,29 @@ export default function Header({
               {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5 text-amber-500" />}
             </button>
 
-            {/* Rider quick hub */}
-            <button
-              onClick={onOpenRider}
-              className="p-2 rounded-xl text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-850 transition-colors hidden sm:block"
-              title="Área do Entregador"
-              id="header-rider-btn"
-            >
-              <Bike className="w-5 h-5" />
-            </button>
+            {/* Rider quick hub - only for admins */}
+            {user?.role === 'admin' && (
+              <button
+                onClick={onOpenRider}
+                className="p-2 rounded-xl text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-850 transition-colors hidden sm:block"
+                title="Área do Entregador"
+                id="header-rider-btn"
+              >
+                <Bike className="w-5 h-5" />
+              </button>
+            )}
 
-            {/* Admin entry point */}
-            <button
-              onClick={onOpenAdmin}
-              className="p-2 rounded-xl text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-850 transition-colors"
-              title="Painel Administrativo"
-              id="header-admin-btn"
-            >
-              <ShieldCheck className="w-5 h-5" />
-            </button>
+            {/* Admin entry point - only for admins */}
+            {user?.role === 'admin' && (
+              <button
+                onClick={onOpenAdmin}
+                className="p-2 rounded-xl text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-850 transition-colors"
+                title="Painel Administrativo"
+                id="header-admin-btn"
+              >
+                <ShieldCheck className="w-5 h-5" />
+              </button>
+            )}
 
             {/* Cart trigger button */}
             <button
@@ -129,6 +137,32 @@ export default function Header({
               <ShoppingBag className="w-4 h-4 sm:w-5 h-5" />
               <span className="text-xs sm:text-sm font-semibold">{cartCount}</span>
             </button>
+
+            {/* Google User Avatar Profile & Disconnect button */}
+            {user && (
+              <div className="flex items-center space-x-2 border-l border-zinc-200 dark:border-zinc-850 pl-3">
+                <img 
+                  src={user.photoUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.name}`} 
+                  alt={user.name} 
+                  className="w-8 h-8 rounded-full border border-rose-500 bg-rose-100 dark:bg-zinc-950 shadow-sm"
+                  title={`${user.name} (${user.email})`}
+                />
+                <div className="hidden md:flex flex-col text-left max-w-[100px]">
+                  <span className="text-[11px] font-black text-zinc-800 dark:text-zinc-100 truncate leading-none mb-0.5">{user.name}</span>
+                  <span className="text-[9px] text-rose-600 dark:text-rose-400 font-bold leading-none uppercase tracking-wide">
+                    {user.role === 'admin' ? 'Admin' : 'Google Mail'}
+                  </span>
+                </div>
+                <button
+                  onClick={onLogout}
+                  className="p-1.5 rounded-xl text-zinc-400 hover:text-rose-600 transition-colors"
+                  title="Sair / Desconectar"
+                  id="header-logout-btn"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            )}
 
           </div>
         </div>

@@ -30,7 +30,16 @@ export default function Cart({
   const [step, setStep] = useState<'cart' | 'details' | 'payment'>('cart');
   
   // Delivery address / User State
-  const [customerName, setCustomerName] = useState('');
+  const [customerName, setCustomerName] = useState(() => {
+    const savedUser = localStorage.getItem('lanchebem_user');
+    if (savedUser) {
+      try {
+        const parsed = JSON.parse(savedUser);
+        return parsed.name || '';
+      } catch (e) {}
+    }
+    return '';
+  });
   const [customerPhone, setCustomerPhone] = useState('');
   const [street, setStreet] = useState('');
   const [number, setNumber] = useState('');

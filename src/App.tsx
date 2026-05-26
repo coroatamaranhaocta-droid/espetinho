@@ -4,7 +4,7 @@ import {
   Flame, Sparkles, Layers, ChefHat, CupSoda, MapPin, Clock, Search,
   ShoppingBag, MessageCircle, Star, Compass, ArrowUpRight
 } from 'lucide-react';
-import { Product, Category, CartItem, StoreSettings } from './types';
+import { Product, Category, CartItem, StoreSettings, User } from './types';
 import Header from './components/Header';
 import Banner from './components/Banner';
 import ProductCard from './components/ProductCard';
@@ -14,6 +14,7 @@ import ChatAI from './components/ChatAI';
 import OrderTracker from './components/OrderTracker';
 import AdminPanel from './components/AdminPanel';
 import RiderPanel from './components/RiderPanel';
+import LoginScreen from './components/LoginScreen';
 
 const DEFAULT_SETTINGS: StoreSettings = {
   name: "Lanchebem",
@@ -43,6 +44,31 @@ export default function App() {
       document.documentElement.classList.remove('dark');
     }
   }, [theme]);
+
+  // User Authentication state
+  const [user, setUser] = useState<User | null>(() => {
+    const saved = localStorage.getItem('lanchebem_user');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const handleLoginSuccess = (usr: User) => {
+    setUser(usr);
+    localStorage.setItem('lanchebem_user', JSON.stringify(usr));
+
+    // Seed name into the Chat AI context as well so onboarding feels natural
+    if (usr.role === 'customer') {
+      localStorage.setItem('lanchebem_chat_customer_name', usr.name);
+      localStorage.setItem('lanchebem_chat_stage', '1'); // direct to cardápio guide
+    }
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('lanchebem_user');
+    localStorage.removeItem('lanchebem_admin_token');
+    localStorage.removeItem('lanchebem_chat_customer_name');
+    localStorage.removeItem('lanchebem_chat_stage');
+  };
 
   // Public Catalog Store states
   const [settings, setSettings] = useState<StoreSettings>(DEFAULT_SETTINGS);
@@ -223,6 +249,10 @@ export default function App() {
     return sum + (item.product.price + sizeAdjust + optsAddition) * item.quantity;
   }, 0);
 
+  if (!user) {
+    return <LoginScreen onLoginSuccess={handleLoginSuccess} theme={theme} />;
+  }
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300 flex flex-col font-sans select-none antialiased">
       
@@ -238,6 +268,8 @@ export default function App() {
         hasActiveOrders={!!activeOrderId}
         theme={theme}
         setTheme={setTheme}
+        user={user}
+        onLogout={handleLogout}
       />
 
       {/* Main Container screen blocks */}

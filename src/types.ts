@@ -98,6 +98,13 @@ export interface Rider {
   phone?: string;
 }
 
+export interface User {
+  email: string;
+  name: string;
+  photoUrl?: string;
+  role: 'customer' | 'admin';
+}
+
 export interface StoreSettings {
   name: string;
   phone: string;

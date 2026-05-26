@@ -1,0 +1,12 @@
+{
+  "name": "Lanchebem Delivery",
+  "description": "Aplicativo de delivery profissional para a lanchonete Lanchebem em Coroatá, Maranhão, com integração com WhatsApp, pagamento por PIX e Painel Administrativo.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

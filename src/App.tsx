@@ -348,32 +348,88 @@ export default function App() {
             <span className="text-xs font-bold text-zinc-400 capitalize">{filteredProducts.length} itens encontrados</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-            <AnimatePresence>
-              {filteredProducts.map((prod) => (
-                <motion.div
-                  key={prod.id}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <ProductCard
-                    product={prod}
-                    onSelect={handleSelectProductToCustomize}
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-            
-            {filteredProducts.length === 0 && (
-              <div className="col-span-full py-16 flex flex-col items-center justify-center text-zinc-400 text-center space-y-1.5">
-                <span className="text-4xl">🍔</span>
-                <p className="text-sm font-semibold">Nenhum hambúrguer ou bebida encontrado.</p>
-                <p className="text-xs max-w-sm">Tente limpar sua pesquisa ou redefinir a categoria.</p>
-              </div>
-            )}
-          </div>
+          {selectedCategory === 'all' ? (
+            <div className="space-y-10">
+              {categories.map((cat) => {
+                const catProducts = products.filter(
+                  (p) =>
+                    p.category === cat.id &&
+                    (p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                     p.description.toLowerCase().includes(searchQuery.toLowerCase()))
+                );
+
+                if (catProducts.length === 0) return null;
+
+                return (
+                  <div key={cat.id} className="space-y-4 text-left" id={`category-group-${cat.id}`}>
+                    <div className="flex items-center space-x-2.5 border-b border-rose-500/10 pb-1.5 pt-2">
+                      <span className="text-lg">{getCategoryIconSymbol(cat.icon)}</span>
+                      <h3 className="text-base sm:text-lg font-black text-zinc-850 dark:text-zinc-100 tracking-tight">
+                        {cat.name}
+                      </h3>
+                      <span className="text-xs font-bold bg-zinc-100 dark:bg-zinc-900 text-zinc-400 dark:text-zinc-500 px-2 py-0.5 rounded-full">
+                        {catProducts.length} {catProducts.length === 1 ? 'item' : 'itens'}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+                      <AnimatePresence>
+                        {catProducts.map((prod) => (
+                          <motion.div
+                            key={prod.id}
+                            initial={{ opacity: 0, y: 15 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <ProductCard
+                              product={prod}
+                              onSelect={handleSelectProductToCustomize}
+                            />
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {filteredProducts.length === 0 && (
+                <div className="py-16 flex flex-col items-center justify-center text-zinc-400 text-center space-y-1.5">
+                  <span className="text-4xl">🍔</span>
+                  <p className="text-sm font-semibold">Nenhum hambúrguer ou bebida encontrado.</p>
+                  <p className="text-xs max-w-sm">Tente limpar sua pesquisa ou redefinir a categoria.</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+              <AnimatePresence>
+                {filteredProducts.map((prod) => (
+                  <motion.div
+                    key={prod.id}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ProductCard
+                      product={prod}
+                      onSelect={handleSelectProductToCustomize}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+              
+              {filteredProducts.length === 0 && (
+                <div className="col-span-full py-16 flex flex-col items-center justify-center text-zinc-400 text-center space-y-1.5">
+                  <span className="text-4xl">🍔</span>
+                  <p className="text-sm font-semibold">Nenhum hambúrguer ou bebida encontrado.</p>
+                  <p className="text-xs max-w-sm">Tente limpar sua pesquisa ou redefinir a categoria.</p>
+                </div>
+              )}
+            </div>
+          )}
         </section>
 
         {/* Location Informative Footer Banner representing Lanchebem */}

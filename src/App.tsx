@@ -47,7 +47,30 @@ export default function App() {
   // User Authentication state
   const [user, setUser] = useState<User | null>(() => {
     const saved = localStorage.getItem('lanchebem_user');
-    return saved ? JSON.parse(saved) : null;
+    if (saved) return JSON.parse(saved);
+
+    // Check if we are trying to access admin login via URL
+    let isAdminFlow = false;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      isAdminFlow = params.get('mode') === 'admin' || params.get('admin') === 'true';
+    } catch (e) {
+      // Ignored
+    }
+
+    if (isAdminFlow) {
+      return null;
+    }
+
+    // Auto login as guest customer to let items load instantly
+    const guestUser: User = {
+      email: 'cliente@lanchebem.com.br',
+      name: 'Cliente Lanchebem',
+      photoUrl: `https://api.dicebear.com/7.x/adventurer/svg?seed=LanchebemCliente`,
+      role: 'customer'
+    };
+    localStorage.setItem('lanchebem_user', JSON.stringify(guestUser));
+    return guestUser;
   });
 
   const handleLoginSuccess = (usr: User) => {

@@ -5,6 +5,7 @@ import {
   ShoppingBag, MessageCircle, Star, Compass, ArrowUpRight, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { Product, Category, CartItem, StoreSettings, User } from './types';
+import { FALLBACK_CATEGORIES, FALLBACK_PRODUCTS } from './fallbackData';
 import Header from './components/Header';
 import ProductCard from './components/ProductCard';
 import ProductModal from './components/ProductModal';
@@ -46,8 +47,12 @@ export default function App() {
 
   // User Authentication state
   const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('lanchebem_user');
-    if (saved) return JSON.parse(saved);
+    try {
+      const saved = localStorage.getItem('lanchebem_user');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn('Failed to parse lanchebem_user', e);
+    }
 
     // Check if we are trying to access admin login via URL
     let isAdminFlow = false;
@@ -69,40 +74,61 @@ export default function App() {
       photoUrl: `https://api.dicebear.com/7.x/adventurer/svg?seed=LanchebemCliente`,
       role: 'customer'
     };
-    localStorage.setItem('lanchebem_user', JSON.stringify(guestUser));
+    try {
+      localStorage.setItem('lanchebem_user', JSON.stringify(guestUser));
+    } catch (e) {
+      // Ignored
+    }
     return guestUser;
   });
 
   const handleLoginSuccess = (usr: User) => {
     setUser(usr);
-    localStorage.setItem('lanchebem_user', JSON.stringify(usr));
+    try {
+      localStorage.setItem('lanchebem_user', JSON.stringify(usr));
+    } catch (e) {
+      // Ignored
+    }
 
     // Seed name into the Chat AI context as well so onboarding feels natural
     if (usr.role === 'customer') {
-      localStorage.setItem('lanchebem_chat_customer_name', usr.name);
-      localStorage.setItem('lanchebem_chat_stage', '1'); // direct to cardápio guide
+      try {
+        localStorage.setItem('lanchebem_chat_customer_name', usr.name);
+        localStorage.setItem('lanchebem_chat_stage', '1'); // direct to cardápio guide
+      } catch (e) {
+        // Ignored
+      }
     }
   };
 
   const handleLogout = () => {
     setUser(null);
-    localStorage.removeItem('lanchebem_user');
-    localStorage.removeItem('lanchebem_admin_token');
-    localStorage.removeItem('lanchebem_chat_customer_name');
-    localStorage.removeItem('lanchebem_chat_stage');
+    try {
+      localStorage.removeItem('lanchebem_user');
+      localStorage.removeItem('lanchebem_admin_token');
+      localStorage.removeItem('lanchebem_chat_customer_name');
+      localStorage.removeItem('lanchebem_chat_stage');
+    } catch (e) {
+      // Ignored
+    }
   };
 
   // Public Catalog Store states
   const [settings, setSettings] = useState<StoreSettings>(DEFAULT_SETTINGS);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>(FALLBACK_CATEGORIES);
+  const [products, setProducts] = useState<Product[]>(FALLBACK_PRODUCTS);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showCategories, setShowCategories] = useState(false);
 
   // Cart Local Storage Sync states
   const [cart, setCart] = useState<CartItem[]>(() => {
-    const saved = localStorage.getItem('lanchebem_cart');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('lanchebem_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.warn('Failed to parse lanchebem_cart', e);
+      return [];
+    }
   });
 
   useEffect(() => {
@@ -147,11 +173,16 @@ export default function App() {
       const prodRes = await fetch('/api/public/products');
       if (prodRes.ok) {
         const data = await prodRes.json();
-        setCategories(data.categories || []);
-        setProducts(data.products || []);
+        setCategories(data.categories && data.categories.length > 0 ? data.categories : FALLBACK_CATEGORIES);
+        setProducts(data.products && data.products.length > 0 ? data.products : FALLBACK_PRODUCTS);
+      } else {
+        setCategories(FALLBACK_CATEGORIES);
+        setProducts(FALLBACK_PRODUCTS);
       }
     } catch (err) {
       console.error('Failed to sync store info', err);
+      setCategories(FALLBACK_CATEGORIES);
+      setProducts(FALLBACK_PRODUCTS);
     }
   };
 

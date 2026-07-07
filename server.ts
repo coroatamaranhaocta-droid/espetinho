@@ -127,7 +127,7 @@ const DEFAULT_DB: DB = {
       id: "p1",
       name: "Carne de Gado Tradicional",
       description: "Espetinho de carne bovina perfeitamente temperada e assada na brasa.",
-      price: 10.00,
+      price: 15.00,
       category: "bovinos",
       image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80&w=600",
       isAvailable: true,
@@ -147,7 +147,7 @@ const DEFAULT_DB: DB = {
       id: "p3",
       name: "Picanha",
       description: "Nobre picanha fatiada no espeto e assada com sal grosso direto na brasa.",
-      price: 18.00,
+      price: 15.00,
       category: "bovinos",
       image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=600",
       isAvailable: true
@@ -156,7 +156,7 @@ const DEFAULT_DB: DB = {
       id: "p4",
       name: "Kafta Bovino",
       description: "Carne moída bovina selecionada e temperada com ervas aromáticas assada de forma suculenta.",
-      price: 12.00,
+      price: 15.00,
       category: "bovinos",
       image: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=600",
       isAvailable: true
@@ -165,7 +165,7 @@ const DEFAULT_DB: DB = {
       id: "p5",
       name: "Porco Tradicional",
       description: "Espetinho de carne suína premium, marinada com temperos especiais da casa e assada na brasa.",
-      price: 9.05,
+      price: 15.00,
       category: "suinos",
       image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80&w=600",
       isAvailable: true
@@ -174,7 +174,7 @@ const DEFAULT_DB: DB = {
       id: "p6",
       name: "Costelinha Suína",
       description: "Costelinha de porco suculenta, preparada lentamente e finalizada no fogo forte.",
-      price: 14.00,
+      price: 15.00,
       category: "suinos",
       image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=600",
       isAvailable: true,
@@ -184,7 +184,7 @@ const DEFAULT_DB: DB = {
       id: "p7",
       name: "Linguiça Toscana",
       description: "Linguiça toscana tradicional dourada e super suculenta assada na brasa.",
-      price: 8.00,
+      price: 15.00,
       category: "suinos",
       image: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=600",
       isAvailable: true
@@ -193,7 +193,7 @@ const DEFAULT_DB: DB = {
       id: "p8",
       name: "Bacon com Queijo",
       description: "Cubos de queijo coalho envolvidos por generosa fatia de bacon crocante assados na brasa.",
-      price: 13.00,
+      price: 15.00,
       category: "suinos",
       image: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=600",
       isAvailable: true
@@ -202,7 +202,7 @@ const DEFAULT_DB: DB = {
       id: "p9",
       name: "Frango Tradicional",
       description: "Espetinho de frango macio (peito/coxa) temperado assado no ponto certo.",
-      price: 8.00,
+      price: 15.00,
       category: "frango",
       image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80&w=600",
       isAvailable: true
@@ -211,7 +211,7 @@ const DEFAULT_DB: DB = {
       id: "p10",
       name: "Frango com Bacon",
       description: "Deliciosos medalhões de frango suculentos envolvidos em fatias crocantes de bacon.",
-      price: 12.00,
+      price: 15.00,
       category: "frango",
       image: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=600",
       isAvailable: true,
@@ -220,8 +220,8 @@ const DEFAULT_DB: DB = {
     {
       id: "p11",
       name: "Coração de Frango",
-      description: "Corações de frango marinados em tempero especial e assados de forma suculenta na brasa.",
-      price: 10.00,
+      "description": "Corações de frango marinados em tempero especial e assados de forma suculenta na brasa.",
+      price: 15.00,
       category: "frango",
       image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80&w=600",
       isAvailable: true
@@ -230,7 +230,7 @@ const DEFAULT_DB: DB = {
       id: "p12",
       name: "Frango com Queijo",
       description: "Espetinho de frango suculento perfeitamente combinado com queijo derretido.",
-      price: 11.00,
+      price: 15.00,
       category: "frango",
       image: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=600",
       isAvailable: true
@@ -239,7 +239,7 @@ const DEFAULT_DB: DB = {
       id: "p13",
       name: "Farofa",
       description: "Farofa artesanal temperada com manteiga e farinha de mandioca crocante para acompanhar.",
-      price: 3.00,
+      price: 0.00,
       category: "acompanhamentos",
       image: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=600",
       isAvailable: true
@@ -248,7 +248,7 @@ const DEFAULT_DB: DB = {
       id: "p14",
       name: "Vinagrete",
       description: "Vinagrete fresco e picadinho com cebola, tomate e cheiro verde.",
-      price: 3.00,
+      price: 0.00,
       category: "acompanhamentos",
       image: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=600",
       isAvailable: true
@@ -257,7 +257,7 @@ const DEFAULT_DB: DB = {
       id: "p15",
       name: "Arroz Branco",
       description: "Porção generosa de arroz branco soltinho preparado no dia.",
-      price: 5.00,
+      price: 0.00,
       category: "acompanhamentos",
       image: "https://images.unsplash.com/photo-1516685018646-549198525c1b?auto=format&fit=crop&q=80&w=600",
       isAvailable: true
@@ -266,7 +266,7 @@ const DEFAULT_DB: DB = {
       id: "p16",
       name: "Batata Frita",
       description: "Porção de batata palito frita sequinha e super crocante.",
-      price: 10.00,
+      price: 0.00,
       category: "acompanhamentos",
       image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&q=80&w=600",
       isAvailable: true
@@ -275,7 +275,7 @@ const DEFAULT_DB: DB = {
       id: "p17",
       name: "Molho Especial",
       description: "Molho exclusivo da casa Lanchebem para dar aquele toque especial aos espetinhos.",
-      price: 2.00,
+      price: 0.00,
       category: "acompanhamentos",
       image: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=600",
       isAvailable: true
@@ -688,7 +688,7 @@ NUNCA invente itens ou preços que não estão acima listados. Se o cliente demo
   app.post('/api/admin/login', (req, res) => {
     const { username, password } = req.body;
     // Standard secure defaults
-    if (username === 'admin' && password === 'lanchebem123') {
+    if (username === 'admin' && password === 'cta12345') {
       const token = signToken({ username: 'admin', role: 'admin' });
       res.json({ success: true, token });
     } else {

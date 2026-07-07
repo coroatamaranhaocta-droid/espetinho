@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Flame, Sparkles, Layers, ChefHat, CupSoda, MapPin, Clock, Search,
-  ShoppingBag, MessageCircle, Star, Compass, ArrowUpRight
+  ShoppingBag, MessageCircle, Star, Compass, ArrowUpRight, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { Product, Category, CartItem, StoreSettings, User } from './types';
 import Header from './components/Header';
-import Banner from './components/Banner';
 import ProductCard from './components/ProductCard';
 import ProductModal from './components/ProductModal';
 import Cart from './components/Cart';
@@ -76,6 +75,7 @@ export default function App() {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showCategories, setShowCategories] = useState(false);
 
   // Cart Local Storage Sync states
   const [cart, setCart] = useState<CartItem[]>(() => {
@@ -275,64 +275,103 @@ export default function App() {
       {/* Main Container screen blocks */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 text-center pb-24 sm:pb-32">
         
-        {/* Banner with Framer Motion slides */}
-        <Banner banners={settings.customBanners && settings.customBanners.length ? settings.customBanners : []} />
-
         {/* Dynamic Categories Selector Row */}
         <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-extrabold uppercase tracking-wider text-zinc-650 dark:text-zinc-350 flex items-center gap-1.5">
-              <span>Categorias:</span>
-            </h3>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 pb-2" id="category-scroller-row">
-            {/* Clear All Categories option */}
+          <div className="flex flex-col items-center justify-center gap-3">
+            {/* Main Toggle Button: "Todos" */}
             <button
-              onClick={() => setSelectedCategory('all')}
-              className={`p-3.5 px-5.5 rounded-2xl flex items-center space-x-2 text-xs sm:text-sm font-extrabold border transition shrink-0 ${
+              onClick={() => {
+                setSelectedCategory('all');
+                setShowCategories(!showCategories);
+              }}
+              className={`p-3.5 px-6 rounded-2xl flex items-center justify-center gap-2 text-sm font-extrabold border transition duration-200 ${
                 selectedCategory === 'all'
-                  ? 'bg-rose-600 border-rose-500 text-white shadow-lg shadow-rose-500/15'
+                  ? 'bg-rose-600 border-rose-500 text-white shadow-lg shadow-rose-500/20'
                   : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-850 text-zinc-650 dark:text-zinc-350 hover:bg-zinc-100/50'
               }`}
               id="category-tab-all"
             >
               <span>⭐</span>
               <span>Todos</span>
+              <motion.span
+                animate={{ rotate: showCategories ? 180 : 0 }}
+                transition={{ duration: 0.15 }}
+                className="ml-1"
+              >
+                <ChevronDown className="w-4 h-4" />
+              </motion.span>
             </button>
 
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`p-3.5 px-5.5 rounded-2xl flex items-center space-x-2 text-xs sm:text-sm font-extrabold border transition shrink-0 ${
-                  selectedCategory === cat.id
-                    ? 'bg-rose-600 border-rose-500 text-white shadow-lg shadow-rose-500/15'
-                    : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-850 text-zinc-650 dark:text-zinc-350 hover:bg-zinc-100/50'
-                }`}
-                id={`category-tab-${cat.id}`}
-              >
-                <span>{getCategoryIconSymbol(cat.icon)}</span>
-                <span>{cat.name}</span>
-              </button>
-            ))}
-          </div>
-        </section>
+            {/* If a specific category is selected, we show a small indicator */}
+            {selectedCategory !== 'all' && (
+              <div className="text-xs font-bold text-zinc-500 flex items-center gap-1.5">
+                <span>Categoria Ativa:</span>
+                <span className="text-rose-600 dark:text-rose-400 bg-rose-500/10 px-2.5 py-0.5 rounded-full border border-rose-500/10 flex items-center gap-1">
+                  <span>{categories.find(c => c.id === selectedCategory)?.name || selectedCategory}</span>
+                </span>
+                <button 
+                  onClick={() => {
+                    setSelectedCategory('all');
+                  }}
+                  className="text-xs font-black text-rose-500 hover:underline ml-1"
+                >
+                  Limpar Filtro
+                </button>
+              </div>
+            )}
 
-        {/* Smart Search filter Row (Mobile-safe input spacing) */}
-        <section className="space-y-3.5">
-          <div className="relative w-full max-w-lg mx-auto bg-white dark:bg-zinc-900 p-1.5 border border-zinc-200 dark:border-zinc-850 rounded-2xl shadow-sm focus-within:border-rose-450 focus-within:ring-1 focus-within:ring-rose-455 transition duration-200">
-            <div className="flex items-center space-x-2.5 px-2">
-              <Search className="w-5 h-5 text-rose-500 shrink-0" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Qual lanche vamos saborear hoje?"
-                className="flex-1 text-xs sm:text-sm p-1.5 focus:outline-none dark:text-zinc-200 font-medium"
-                id="search-input"
-              />
-            </div>
+            {/* Expandable Categories Menu */}
+            <AnimatePresence>
+              {showCategories && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden w-full max-w-2xl bg-zinc-50 dark:bg-zinc-950 p-4 rounded-3xl border border-zinc-200/60 dark:border-zinc-850/60 mt-1"
+                >
+                  <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-3">
+                    Selecione uma categoria para filtrar o cardápio:
+                  </p>
+                  <div className="flex flex-wrap items-center justify-center gap-2" id="category-scroller-row">
+                    {/* Option to select All inside the list too */}
+                    <button
+                      onClick={() => {
+                        setSelectedCategory('all');
+                        setShowCategories(false);
+                      }}
+                      className={`p-3 px-4.5 rounded-xl flex items-center space-x-2 text-xs sm:text-sm font-bold border transition ${
+                        selectedCategory === 'all'
+                          ? 'bg-rose-600 border-rose-500 text-white shadow-md'
+                          : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-850 text-zinc-650 dark:text-zinc-350 hover:bg-zinc-100/50'
+                      }`}
+                    >
+                      <span>⭐</span>
+                      <span>Ver Tudo</span>
+                    </button>
+
+                    {categories.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => {
+                          setSelectedCategory(cat.id);
+                          setShowCategories(false);
+                        }}
+                        className={`p-3 px-4.5 rounded-xl flex items-center space-x-2 text-xs sm:text-sm font-bold border transition ${
+                          selectedCategory === cat.id
+                            ? 'bg-rose-600 border-rose-500 text-white shadow-md'
+                            : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-850 text-zinc-650 dark:text-zinc-350 hover:bg-zinc-100/50'
+                        }`}
+                        id={`category-tab-${cat.id}`}
+                      >
+                        <span>{getCategoryIconSymbol(cat.icon)}</span>
+                        <span>{cat.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </section>
 

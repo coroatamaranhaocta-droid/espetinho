@@ -290,16 +290,7 @@ export default function LoginScreen({ onLoginSuccess, theme }: LoginScreenProps)
                 </button>
               </div>
 
-              <div className="pt-4 border-t border-zinc-150 dark:border-zinc-850">
-                <button
-                  onClick={handleToggleAdmin}
-                  className="text-xs font-bold text-rose-655 dark:text-rose-405 flex items-center justify-center gap-1.5 mx-auto hover:underline"
-                  id="toggle-admin-login-link"
-                >
-                  <Key className="w-3.5 h-3.5" />
-                  <span>Acesso Administrativo / Portaria</span>
-                </button>
-              </div>
+              {/* O acesso operacional pode ser forçado via parâmetro ?mode=admin no link */}
             </motion.div>
           ) : (
             <motion.div

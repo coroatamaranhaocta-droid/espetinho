@@ -74,7 +74,6 @@ export default function App() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
   const [showCategories, setShowCategories] = useState(false);
 
   // Cart Local Storage Sync states
@@ -236,10 +235,7 @@ export default function App() {
 
   // Perform filtering elements
   const filteredProducts = products.filter((p) => {
-    const matchCategory = selectedCategory === 'all' || p.category === selectedCategory;
-    const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        p.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchCategory && matchSearch;
+    return selectedCategory === 'all' || p.category === selectedCategory;
   });
 
   const cartItemsCount = cart.reduce((add, next) => add + next.quantity, 0);
@@ -391,10 +387,7 @@ export default function App() {
             <div className="space-y-10">
               {categories.map((cat) => {
                 const catProducts = products.filter(
-                  (p) =>
-                    p.category === cat.id &&
-                    (p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                     p.description.toLowerCase().includes(searchQuery.toLowerCase()))
+                  (p) => p.category === cat.id
                 );
 
                 if (catProducts.length === 0) return null;
@@ -435,9 +428,9 @@ export default function App() {
 
               {filteredProducts.length === 0 && (
                 <div className="py-16 flex flex-col items-center justify-center text-zinc-400 text-center space-y-1.5">
-                  <span className="text-4xl">🍔</span>
-                  <p className="text-sm font-semibold">Nenhum hambúrguer ou bebida encontrado.</p>
-                  <p className="text-xs max-w-sm">Tente limpar sua pesquisa ou redefinir a categoria.</p>
+                  <span className="text-4xl">🍢</span>
+                  <p className="text-sm font-semibold">Nenhum espetinho ou bebida disponível.</p>
+                  <p className="text-xs max-w-sm">Selecione outra categoria para ver os itens.</p>
                 </div>
               )}
             </div>
@@ -462,9 +455,9 @@ export default function App() {
               
               {filteredProducts.length === 0 && (
                 <div className="col-span-full py-16 flex flex-col items-center justify-center text-zinc-400 text-center space-y-1.5">
-                  <span className="text-4xl">🍔</span>
-                  <p className="text-sm font-semibold">Nenhum hambúrguer ou bebida encontrado.</p>
-                  <p className="text-xs max-w-sm">Tente limpar sua pesquisa ou redefinir a categoria.</p>
+                  <span className="text-4xl">🍢</span>
+                  <p className="text-sm font-semibold">Nenhum espetinho ou bebida disponível.</p>
+                  <p className="text-xs max-w-sm">Selecione outra categoria para ver os itens.</p>
                 </div>
               )}
             </div>

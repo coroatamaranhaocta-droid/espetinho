@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShoppingBag, Plus, Minus, Trash2, MapPin, Tag, Truck, CreditCard, ChevronRight } from 'lucide-react';
+import { X, ShoppingBag, Plus, Minus, Trash2, MapPin, Tag, Truck, CreditCard, ChevronRight, Check, MessageSquare } from 'lucide-react';
 import { CartItem, StoreSettings, Coupon } from '../types';
 import PixPayment from './PixPayment';
 
@@ -27,7 +27,9 @@ export default function Cart({
   if (!isOpen) return null;
 
   // Checkout phases
-  const [step, setStep] = useState<'cart' | 'details' | 'payment'>('cart');
+  const [step, setStep] = useState<'cart' | 'details' | 'payment' | 'success'>('cart');
+  const [whatsappUrlToOpen, setWhatsappUrlToOpen] = useState('');
+  const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
   const [formError, setFormError] = useState('');
 
   // Helper function to format Brazilian phone/WhatsApp dynamically
@@ -187,6 +189,16 @@ export default function Cart({
     setStep('payment');
   };
 
+  const handleFinalizeAndTrack = () => {
+    if (createdOrderId) {
+      onOrderSuccess(createdOrderId);
+    }
+    onClearCart();
+    onClose();
+    // Reset step for next open
+    setStep('cart');
+  };
+
   const handleCheckoutComplete = async () => {
     setSubmitting(true);
     try {
@@ -284,41 +296,31 @@ ${addressDetails}
 _Acompanhe seu pedido no app Lanchebem!_`;
 
       const encodedMsg = encodeURIComponent(waMessage);
-      const whatsappURL = `https://api.whatsapp.com/send?phone=5599984545370&text=${encodedMsg}`;
+      
+      const storePhone = settings?.phone || '99984545370';
+      const cleanPhone = storePhone.replace(/\D/g, '');
+      const waPhone = cleanPhone.startsWith('55') ? cleanPhone : `55${cleanPhone}`;
+      const whatsappURL = `https://api.whatsapp.com/send?phone=${waPhone}&text=${encodedMsg}`;
 
-      // Open WhatsApp Link safely within try-catch to avoid blocking popup/sandbox errors
+      setWhatsappUrlToOpen(whatsappURL);
+      setCreatedOrderId(order.id);
+      setStep('success');
+
+      // Best effort auto-open in a new tab immediately
       try {
         const opened = window.open(whatsappURL, '_blank');
         if (!opened) {
-          // If window.open returned null, attempt direct link click fallback
-          const link = document.createElement('a');
-          link.href = whatsappURL;
-          link.target = '_blank';
-          link.rel = 'noopener noreferrer';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+          // If window.open was blocked (common in iframe sandboxes), we also redirect window.location.href after a slight delay
+          setTimeout(() => {
+            window.location.href = whatsappURL;
+          }, 1200);
         }
       } catch (waErr) {
-        console.warn('WhatsApp popup was blocked or failed to open', waErr);
-        // Do not block order progress, just log and fall back to opening in current tab if possible
-        try {
-          const link = document.createElement('a');
-          link.href = whatsappURL;
-          link.target = '_blank';
-          link.rel = 'noopener noreferrer';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        } catch (innerErr) {
-          console.warn('Secondary redirection link also failed', innerErr);
-        }
+        console.warn('WhatsApp auto-open failed, falling back to location.href:', waErr);
+        setTimeout(() => {
+          window.location.href = whatsappURL;
+        }, 1200);
       }
-
-      // Setup tracker and trigger success callbacks
-      onOrderSuccess(order.id);
-      onClearCart();
-      onClose();
     } catch (err) {
       console.error(err);
       alert('Ocorreu um erro ao enviar seu pedido. Tente novamente.');
@@ -330,9 +332,79 @@ _Acompanhe seu pedido no app Lanchebem!_`;
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs animate-fade-in" id="cart-drawer-container">
       <div className="w-full max-w-md bg-white dark:bg-zinc-900 h-full flex flex-col shadow-2xl relative">
-        
-        {/* Draw Header bar */}
-        <div className="p-4 sm:p-5 border-b border-zinc-200 dark:border-zinc-800 shrink-0 flex items-center justify-between text-zinc-950 dark:text-zinc-50">
+        {step === 'success' ? (
+          <div className="flex-1 flex flex-col justify-between h-full bg-white dark:bg-zinc-900">
+            {/* Header */}
+            <div className="p-4 sm:p-5 border-b border-zinc-200 dark:border-zinc-800 shrink-0 flex items-center justify-between text-zinc-950 dark:text-zinc-50">
+              <div className="flex items-center space-x-2">
+                <span className="text-xl">🎉</span>
+                <h2 className="text-lg font-black tracking-tight">Pedido Recebido!</h2>
+              </div>
+              <button
+                onClick={handleFinalizeAndTrack}
+                className="p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-700 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Success Content */}
+            <div className="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center text-center space-y-6 animate-fade-in">
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-950/40 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center animate-bounce shadow-md">
+                <Check className="w-8 h-8 stroke-[3]" />
+              </div>
+              
+              <div className="space-y-2 max-w-xs mx-auto">
+                <h3 className="text-xl font-black text-zinc-900 dark:text-zinc-50 leading-tight">
+                  Pedido Registrado!
+                </h3>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed font-semibold">
+                  Seu pedido foi recebido no Lanchebem. Estamos te enviando para o WhatsApp para confirmar os detalhes do preparo!
+                </p>
+              </div>
+
+              {/* Informative PIX alert if they chose PIX */}
+              {paymentMethod === 'PIX' && (
+                <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-500/25 rounded-2xl text-left text-amber-700 dark:text-amber-400 text-xs font-semibold max-w-xs mx-auto space-y-1">
+                  <p className="font-extrabold uppercase tracking-wider text-[10px] text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
+                    <span>⚠️</span>
+                    <span>Lembrete Importante</span>
+                  </p>
+                  <p className="opacity-95 leading-relaxed text-[11px]">
+                    Lembre-se que <strong className="text-amber-900 dark:text-amber-200">NÃO ACEITAMOS PIX AGENDADO</strong>. Certifique-se de que o comprovante enviado é de transferência imediata.
+                  </p>
+                </div>
+              )}
+
+              <div className="w-full max-w-xs pt-4 space-y-3.5">
+                <a
+                  href={whatsappUrlToOpen}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full p-4 bg-green-600 hover:bg-green-700 active:scale-98 text-white font-black text-sm rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-green-500/20 transition-all duration-150"
+                  id="success-whatsapp-trigger"
+                >
+                  <MessageSquare className="w-5 h-5" />
+                  <span>Enviar Agora no WhatsApp</span>
+                </a>
+
+                <button
+                  onClick={handleFinalizeAndTrack}
+                  className="w-full p-3.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 font-extrabold text-xs rounded-2xl transition-all"
+                >
+                  Acompanhar Status na Tela
+                </button>
+              </div>
+
+              <p className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium max-w-[240px] mx-auto leading-normal">
+                Se você já abriu o WhatsApp e enviou a mensagem, pode clicar em "Acompanhar Status na Tela" para ver o progresso da entrega em tempo real.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Draw Header bar */}
+            <div className="p-4 sm:p-5 border-b border-zinc-200 dark:border-zinc-800 shrink-0 flex items-center justify-between text-zinc-950 dark:text-zinc-50">
           <div className="flex items-center space-x-2">
             <div className="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-450 flex items-center justify-center">
               <ShoppingBag className="w-5 h-5" />
@@ -747,7 +819,8 @@ _Acompanhe seu pedido no app Lanchebem!_`;
             )}
           </div>
         </div>
-
+          </>
+        )}
       </div>
     </div>
   );

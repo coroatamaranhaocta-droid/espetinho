@@ -323,7 +323,7 @@ export default function App() {
       />
 
       {/* Main Container screen blocks */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 text-center pb-24 sm:pb-32">
+      <main className="flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-8 lg:px-10 py-6 space-y-8 text-center pb-24 sm:pb-32">
         
         {/* Dynamic Categories Selector Row */}
         <section className="space-y-4">

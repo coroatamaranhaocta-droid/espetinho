@@ -19,6 +19,54 @@ export default function OrderTracker({ orderId, onClose }: OrderTrackerProps) {
   const [localSimPercent, setLocalSimPercent] = useState(0);
   const [localSimulating, setLocalSimulating] = useState(false);
 
+  const getWhatsAppLink = () => {
+    if (!order) {
+      return `https://api.whatsapp.com/send?phone=5599984545370&text=Ol%C3%A1%20Lanchebem!%20Gostaria%20de%20informa%C3%A7%C3%B5es%20sobre%20meu%20pedido%20${orderId}`;
+    }
+
+    const itemsList = order.items
+      .map((item) => {
+        const sizeStr = item.selectedSize ? ` - Tam: ${item.selectedSize}` : '';
+        const optsStr = item.selectedOptions && item.selectedOptions.length
+          ? `\n  + Adicionais: ${item.selectedOptions.join(', ')}`
+          : '';
+        const obsStr = item.observation ? `\n  _Obs: ${item.observation}_` : '';
+        return `• ${item.quantity}x ${item.productName}${sizeStr}${optsStr}${obsStr}`;
+      })
+      .join('\n');
+
+    const address = order.deliveryAddress;
+    const addressDetails = `${address.street}, N° ${address.number}
+Bairro: ${address.neighborhood}${address.complement ? `\nCompl: ${address.complement}` : ''}${address.reference ? `\nRef: ${address.reference}` : ''}`;
+
+    const subtotal = order.subtotal;
+    const deliveryFee = order.deliveryFee;
+    const total = order.total;
+    const paymentMethod = order.paymentMethod;
+    const changeFor = order.paymentDetails?.changeFor;
+
+    const waMessage = `*🍔 NOVO PEDIDO - LANCHEBEM (${order.id})*
+----------------------------------
+*Cliente:* ${order.customerName}
+*Telefone:* ${order.customerPhone}
+----------------------------------
+*Produtos:*
+${itemsList}
+
+*Subtotal:* R$ ${subtotal.toFixed(2)}
+*Taxa de Entrega:* R$ ${deliveryFee.toFixed(2)}
+*TOTAL:* R$ ${total.toFixed(2)}
+----------------------------------
+*Forma de Pagamento:* ${paymentMethod}
+${paymentMethod === 'Dinheiro' && changeFor ? `*Troco para:* R$ ${Number(changeFor).toFixed(2)}\n` : ''}${paymentMethod === 'PIX' ? `*(Comprovante enviado pelo site!)*\n` : ''}----------------------------------
+*Endereço de Entrega:*
+${addressDetails}
+
+_Acompanhe seu pedido no app Lanchebem!_`;
+
+    return `https://api.whatsapp.com/send?phone=5599984545370&text=${encodeURIComponent(waMessage)}`;
+  };
+
   const fetchOrderStatus = async () => {
     if (!orderId) return;
     try {
@@ -519,7 +567,7 @@ export default function OrderTracker({ orderId, onClose }: OrderTrackerProps) {
         {/* WhatsApp and Close support buttons footer */}
         <div className="p-4 sm:p-5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 flex flex-col sm:flex-row gap-3 shrink-0 justify-center">
           <a
-            href={`https://api.whatsapp.com/send?phone=5599984545370&text=Ol%C3%A1%20Lanchebem!%20Gostaria%20de%20informa%C3%A7%C3%B5es%20sobre%20meu%20pedido%20${orderId}`}
+            href={getWhatsAppLink()}
             target="_blank"
             rel="noopener noreferrer"
             className="flex-grow p-3.5 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-rose-500/10 text-xs sm:text-sm transition-transform active:scale-99"

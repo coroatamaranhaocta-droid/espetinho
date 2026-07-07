@@ -28,24 +28,86 @@ export default function Cart({
 
   // Checkout phases
   const [step, setStep] = useState<'cart' | 'details' | 'payment'>('cart');
+  const [formError, setFormError] = useState('');
+
+  // Helper function to format Brazilian phone/WhatsApp dynamically
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, '');
+    const limited = digits.slice(0, 11);
+    if (limited.length <= 2) {
+      return limited;
+    }
+    if (limited.length <= 6) {
+      return `(${limited.slice(0, 2)}) ${limited.slice(2)}`;
+    }
+    if (limited.length <= 10) {
+      return `(${limited.slice(0, 2)}) ${limited.slice(2, 6)}-${limited.slice(6)}`;
+    }
+    return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7)}`;
+  };
   
   // Delivery address / User State
   const [customerName, setCustomerName] = useState(() => {
-    const savedUser = localStorage.getItem('lanchebem_user');
-    if (savedUser) {
-      try {
+    try {
+      const saved = localStorage.getItem('lanchebem_customer_name');
+      if (saved) return saved;
+      const savedUser = localStorage.getItem('lanchebem_user');
+      if (savedUser) {
         const parsed = JSON.parse(savedUser);
         return parsed.name || '';
-      } catch (e) {}
-    }
+      }
+    } catch (e) {}
     return '';
   });
-  const [customerPhone, setCustomerPhone] = useState('');
-  const [street, setStreet] = useState('');
-  const [number, setNumber] = useState('');
-  const [neighborhood, setNeighborhood] = useState('Mariol');
-  const [complement, setComplement] = useState('');
-  const [reference, setReference] = useState('');
+  
+  const [customerPhone, setCustomerPhone] = useState(() => {
+    try {
+      const saved = localStorage.getItem('lanchebem_customer_phone');
+      return saved ? formatPhone(saved) : '';
+    } catch (e) {
+      return '';
+    }
+  });
+
+  const [street, setStreet] = useState(() => {
+    try {
+      return localStorage.getItem('lanchebem_customer_street') || '';
+    } catch (e) {
+      return '';
+    }
+  });
+
+  const [number, setNumber] = useState(() => {
+    try {
+      return localStorage.getItem('lanchebem_customer_number') || '';
+    } catch (e) {
+      return '';
+    }
+  });
+
+  const [neighborhood, setNeighborhood] = useState(() => {
+    try {
+      return localStorage.getItem('lanchebem_customer_neighborhood') || 'Mariol';
+    } catch (e) {
+      return 'Mariol';
+    }
+  });
+
+  const [complement, setComplement] = useState(() => {
+    try {
+      return localStorage.getItem('lanchebem_customer_complement') || '';
+    } catch (e) {
+      return '';
+    }
+  });
+
+  const [reference, setReference] = useState(() => {
+    try {
+      return localStorage.getItem('lanchebem_customer_reference') || '';
+    } catch (e) {
+      return '';
+    }
+  });
 
   // Coupon State
   const [couponCode, setCouponCode] = useState('');
@@ -102,10 +164,26 @@ export default function Cart({
   };
 
   const handleApplyStepDetails = () => {
-    if (!customerName || !customerPhone || !street || !number || !neighborhood) {
-      alert('Por favor, preencha todos os campos obrigatórios identificados (*).');
+    if (!customerName.trim() || !customerPhone.trim() || !street.trim() || !number.trim() || !neighborhood.trim()) {
+      setFormError('Por favor, preencha todos os campos obrigatórios identificados (*).');
       return;
     }
+
+    setFormError('');
+
+    // Save fields to localStorage for returning customers
+    try {
+      localStorage.setItem('lanchebem_customer_name', customerName.trim());
+      localStorage.setItem('lanchebem_customer_phone', customerPhone.trim());
+      localStorage.setItem('lanchebem_customer_street', street.trim());
+      localStorage.setItem('lanchebem_customer_number', number.trim());
+      localStorage.setItem('lanchebem_customer_neighborhood', neighborhood.trim());
+      localStorage.setItem('lanchebem_customer_complement', complement.trim());
+      localStorage.setItem('lanchebem_customer_reference', reference.trim());
+    } catch (e) {
+      console.warn('Could not save customer details to localStorage:', e);
+    }
+
     setStep('payment');
   };
 
@@ -208,8 +286,34 @@ _Acompanhe seu pedido no app Lanchebem!_`;
       const encodedMsg = encodeURIComponent(waMessage);
       const whatsappURL = `https://api.whatsapp.com/send?phone=5599984545370&text=${encodedMsg}`;
 
-      // Open WhatsApp Link
-      window.open(whatsappURL, '_blank');
+      // Open WhatsApp Link safely within try-catch to avoid blocking popup/sandbox errors
+      try {
+        const opened = window.open(whatsappURL, '_blank');
+        if (!opened) {
+          // If window.open returned null, attempt direct link click fallback
+          const link = document.createElement('a');
+          link.href = whatsappURL;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      } catch (waErr) {
+        console.warn('WhatsApp popup was blocked or failed to open', waErr);
+        // Do not block order progress, just log and fall back to opening in current tab if possible
+        try {
+          const link = document.createElement('a');
+          link.href = whatsappURL;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } catch (innerErr) {
+          console.warn('Secondary redirection link also failed', innerErr);
+        }
+      }
 
       // Setup tracker and trigger success callbacks
       onOrderSuccess(order.id);
@@ -366,68 +470,103 @@ _Acompanhe seu pedido no app Lanchebem!_`;
           )}
 
           {step === 'details' && (
-            <div className="space-y-4">
-              <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-150 border-b pb-1.5 flex items-center space-x-1.5">
-                <MapPin className="w-4 h-4 text-rose-600" />
-                <span>Dados de Identificação & Endereço:</span>
+            <div className="space-y-5 animate-fade-in">
+              <h3 className="text-sm font-black text-zinc-900 dark:text-zinc-50 border-b pb-2 flex items-center space-x-2">
+                <MapPin className="w-5 h-5 text-rose-600 shrink-0" />
+                <span className="tracking-tight">Dados de Identificação & Endereço</span>
               </h3>
 
-              <div className="space-y-3.5">
+              {formError && (
+                <div className="p-4 bg-rose-50 dark:bg-rose-950/20 border border-rose-500/20 rounded-2xl flex items-start gap-2.5 text-rose-600 text-xs font-semibold animate-shake">
+                  <span className="text-sm mt-0.5">⚠️</span>
+                  <div className="space-y-0.5">
+                    <p className="font-bold text-rose-700 dark:text-rose-400">Campos Obrigatórios</p>
+                    <p className="opacity-90 leading-relaxed">{formError}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-4">
                 <div>
-                  <label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 block mb-1">Seu Nome *</label>
+                  <label className="text-[11px] font-extrabold uppercase text-zinc-500 dark:text-zinc-400 block mb-1.5 tracking-wider">
+                    Seu Nome Completo *
+                  </label>
                   <input
                     type="text"
                     required
                     value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
+                    onChange={(e) => {
+                      setCustomerName(e.target.value);
+                      if (formError) setFormError('');
+                    }}
                     placeholder="Ex: André Souza"
-                    className="w-full text-xs sm:text-sm p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200"
+                    className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200 font-medium placeholder-zinc-400 dark:placeholder-zinc-650"
                   />
                 </div>
                 
                 <div>
-                  <label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 block mb-1">Celular / WhatsApp *</label>
+                  <label className="text-[11px] font-extrabold uppercase text-zinc-500 dark:text-zinc-400 block mb-1.5 tracking-wider">
+                    Celular / WhatsApp (DDD) *
+                  </label>
                   <input
                     type="tel"
                     required
                     value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
-                    placeholder="Ex: 99988112233"
-                    className="w-full text-xs sm:text-sm p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200"
+                    onChange={(e) => {
+                      setCustomerPhone(formatPhone(e.target.value));
+                      if (formError) setFormError('');
+                    }}
+                    placeholder="Ex: (99) 98811-2233"
+                    className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200 font-bold placeholder-zinc-400 dark:placeholder-zinc-650"
                   />
                 </div>
 
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-3">
                   <div className="col-span-2">
-                    <label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 block mb-1">Rua / Travessa *</label>
+                    <label className="text-[11px] font-extrabold uppercase text-zinc-500 dark:text-zinc-400 block mb-1.5 tracking-wider">
+                      Rua / Travessa *
+                    </label>
                     <input
                       type="text"
                       required
                       value={street}
-                      onChange={(e) => setStreet(e.target.value)}
+                      onChange={(e) => {
+                        setStreet(e.target.value);
+                        if (formError) setFormError('');
+                      }}
                       placeholder="Ex: Avenida Central"
-                      className="w-full text-xs sm:text-sm p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200"
+                      className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200 font-medium placeholder-zinc-400 dark:placeholder-zinc-650"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 block mb-1">Número *</label>
+                    <label className="text-[11px] font-extrabold uppercase text-zinc-500 dark:text-zinc-400 block mb-1.5 tracking-wider">
+                      Número *
+                    </label>
                     <input
                       type="text"
                       required
                       value={number}
-                      onChange={(e) => setNumber(e.target.value)}
+                      onChange={(e) => {
+                        setNumber(e.target.value);
+                        if (formError) setFormError('');
+                      }}
                       placeholder="Ex: 45A"
-                      className="w-full text-xs sm:text-sm p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200"
+                      className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200 font-bold placeholder-zinc-400 dark:placeholder-zinc-650"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 block mb-1">Bairro *</label>
+                  <label className="text-[11px] font-extrabold uppercase text-zinc-500 dark:text-zinc-400 block mb-1.5 tracking-wider">
+                    Selecione o Bairro *
+                  </label>
                   <select
                     value={neighborhood}
-                    onChange={(e) => setNeighborhood(e.target.value)}
-                    className="w-full text-xs sm:text-sm p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200"
+                    onChange={(e) => {
+                      setNeighborhood(e.target.value);
+                      if (formError) setFormError('');
+                    }}
+                    className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200 font-bold"
                   >
                     <option value="Mariol">Bairro Mariol</option>
                     <option value="Centro">Centro</option>
@@ -438,24 +577,28 @@ _Acompanhe seu pedido no app Lanchebem!_`;
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 block mb-1">Complemento (Opcional)</label>
+                  <label className="text-[11px] font-extrabold uppercase text-zinc-500 dark:text-zinc-400 block mb-1.5 tracking-wider">
+                    Complemento (Opcional)
+                  </label>
                   <input
                     type="text"
                     value={complement}
                     onChange={(e) => setComplement(e.target.value)}
                     placeholder="Ex: Ap 302, Bloco C"
-                    className="w-full text-xs sm:text-sm p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200"
+                    className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200 font-medium placeholder-zinc-400 dark:placeholder-zinc-650"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 block mb-1">Ponto de Referência (Opcional)</label>
+                  <label className="text-[11px] font-extrabold uppercase text-zinc-500 dark:text-zinc-400 block mb-1.5 tracking-wider">
+                    Ponto de Referência (Opcional)
+                  </label>
                   <input
                     type="text"
                     value={reference}
                     onChange={(e) => setReference(e.target.value)}
                     placeholder="Ex: Próximo à Igreja Matriz"
-                    className="w-full text-xs sm:text-sm p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200"
+                    className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200 font-medium placeholder-zinc-400 dark:placeholder-zinc-650"
                   />
                 </div>
               </div>

@@ -33,7 +33,7 @@ export default function Header({
 }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-md border-b bg-white/95 dark:bg-zinc-900/95 border-zinc-200 dark:border-zinc-800 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-8 lg:px-10">
         <div className="flex items-center justify-between h-16 sm:h-20">
           
           {/* Logo & Status Brand */}

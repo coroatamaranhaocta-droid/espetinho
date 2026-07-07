@@ -23,7 +23,7 @@ export default function PixPayment({
 
   // Generate standard BR Code Copy and Paste value
   const formattedAmount = total.toFixed(2);
-  const pixKey = settings.pixKey || '99984545370';
+  const pixKey = settings.pixKey || '01986157360';
   const name = settings.pixReceiverName || 'Lanchebem';
   const city = settings.pixCity || 'Coroata';
   
@@ -143,6 +143,15 @@ export default function PixPayment({
           Abra o aplicativo do seu banco, escolha <strong>Pagar com QR Code</strong> e aponte a câmera.
         </p>
       </div>
+      
+      {/* Warning: No scheduled PIX */}
+      <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-500/20 rounded-2xl flex items-start gap-2.5 text-amber-700 dark:text-amber-400 text-xs font-semibold leading-relaxed animate-fade-in">
+        <span className="text-base shrink-0 mt-0.5">⚠️</span>
+        <div className="space-y-0.5">
+          <p className="font-extrabold uppercase tracking-wider text-[10px] text-amber-800 dark:text-amber-300">Aviso: Não Aceitamos PIX Agendado</p>
+          <p className="opacity-90 leading-relaxed text-[11px]">Por favor, efetue o pagamento de forma imediata. Pedidos com comprovante de agendamento não serão aprovados ou preparados.</p>
+        </div>
+      </div>
 
       {/* Copy-Paste area */}
       <div className="space-y-2">
@@ -179,7 +188,7 @@ export default function PixPayment({
       {/* Proof of Payment attachment Drag-and-Drop Area */}
       <div className="space-y-2.5">
         <label className="text-xs font-bold text-zinc-650 dark:text-zinc-350 uppercase tracking-wider block">
-          Anexe ou tire foto do Comprovante PIX:
+          Anexe ou tire foto do Comprovante PIX (Não aceitamos PIX Agendado) *
         </label>
         
         <div

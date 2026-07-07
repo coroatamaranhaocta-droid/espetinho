@@ -88,7 +88,7 @@ const DEFAULT_DB: DB = {
     address: "Segunda Travessa São Rafael s/n, Bairro Mariol, Coroatá - MA",
     deliveryFee: 5.00,
     isOpen: true,
-    pixKey: "99984545370",
+    pixKey: "01986157360",
     pixReceiverName: "Lanchebem Ltda",
     pixCity: "Coroata",
     coupons: [

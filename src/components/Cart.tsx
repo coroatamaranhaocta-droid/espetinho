@@ -500,7 +500,7 @@ _Acompanhe seu pedido no app Lanchebem!_`;
                       if (formError) setFormError('');
                     }}
                     placeholder="Ex: André Souza"
-                    className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200 font-medium placeholder-zinc-400 dark:placeholder-zinc-650"
+                    className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 text-zinc-800 dark:text-zinc-100 font-medium placeholder-zinc-400 dark:placeholder-zinc-600 transition-all duration-200 hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 shadow-sm"
                   />
                 </div>
                 
@@ -517,7 +517,7 @@ _Acompanhe seu pedido no app Lanchebem!_`;
                       if (formError) setFormError('');
                     }}
                     placeholder="Ex: (99) 98811-2233"
-                    className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200 font-bold placeholder-zinc-400 dark:placeholder-zinc-650"
+                    className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 text-zinc-800 dark:text-zinc-100 font-bold placeholder-zinc-400 dark:placeholder-zinc-600 transition-all duration-200 hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 shadow-sm"
                   />
                 </div>
 
@@ -535,7 +535,7 @@ _Acompanhe seu pedido no app Lanchebem!_`;
                         if (formError) setFormError('');
                       }}
                       placeholder="Ex: Avenida Central"
-                      className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200 font-medium placeholder-zinc-400 dark:placeholder-zinc-650"
+                      className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 text-zinc-800 dark:text-zinc-100 font-medium placeholder-zinc-400 dark:placeholder-zinc-600 transition-all duration-200 hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 shadow-sm"
                     />
                   </div>
                   <div>
@@ -551,7 +551,7 @@ _Acompanhe seu pedido no app Lanchebem!_`;
                         if (formError) setFormError('');
                       }}
                       placeholder="Ex: 45A"
-                      className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200 font-bold placeholder-zinc-400 dark:placeholder-zinc-650"
+                      className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 text-zinc-800 dark:text-zinc-100 font-bold placeholder-zinc-400 dark:placeholder-zinc-600 transition-all duration-200 hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 shadow-sm"
                     />
                   </div>
                 </div>
@@ -566,7 +566,7 @@ _Acompanhe seu pedido no app Lanchebem!_`;
                       setNeighborhood(e.target.value);
                       if (formError) setFormError('');
                     }}
-                    className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200 font-bold"
+                    className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 text-zinc-800 dark:text-zinc-100 font-bold transition-all duration-200 hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 shadow-sm cursor-pointer"
                   >
                     <option value="Mariol">Bairro Mariol</option>
                     <option value="Centro">Centro</option>
@@ -585,7 +585,7 @@ _Acompanhe seu pedido no app Lanchebem!_`;
                     value={complement}
                     onChange={(e) => setComplement(e.target.value)}
                     placeholder="Ex: Ap 302, Bloco C"
-                    className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200 font-medium placeholder-zinc-400 dark:placeholder-zinc-650"
+                    className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 text-zinc-800 dark:text-zinc-100 font-medium placeholder-zinc-400 dark:placeholder-zinc-600 transition-all duration-200 hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 shadow-sm"
                   />
                 </div>
 
@@ -598,7 +598,7 @@ _Acompanhe seu pedido no app Lanchebem!_`;
                     value={reference}
                     onChange={(e) => setReference(e.target.value)}
                     placeholder="Ex: Próximo à Igreja Matriz"
-                    className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-2xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-zinc-800 dark:text-zinc-200 font-medium placeholder-zinc-400 dark:placeholder-zinc-650"
+                    className="w-full text-xs sm:text-sm p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 text-zinc-800 dark:text-zinc-100 font-medium placeholder-zinc-400 dark:placeholder-zinc-600 transition-all duration-200 hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 shadow-sm"
                   />
                 </div>
               </div>
